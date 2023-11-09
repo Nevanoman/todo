@@ -1,15 +1,48 @@
-import React, { Component } from "react";
+import { Component } from "react";
+import propTypes from 'prop-types';
 import "./newtaskform.css";
 
-class NewTaskForm extends Component {
+export default class NewTaskForm extends Component {
+  static defaultProps = {
+    createTask: () => {},
+  };
+
+  static propTypes = {
+    createTask: propTypes.func,
+  };
+
+  state = {
+    taskLabel: '',
+  };
+
+  inputHandler = (e) => {
+    this.setState({
+      taskLabel: e.target.value,
+    });
+  };
+
+  keyPressHandler = (e) => {
+    if (e.key === 'Enter') {
+      if (this.state.taskLabel && this.state.taskLabel.trim().length !== 0) {
+        this.props.createTask(this.state.taskLabel);
+        this.setState({ taskLabel: '' });
+      }
+    }
+  };
+
   render() {
     return (
-      <header class="header">
+      <header className="header">
         <h1>todos</h1>
-        <input class="new-todo" placeholder="What needs to be done?" autofocus />
+        <input
+          className="new-todo"
+          placeholder="What needs to be done?"
+          autoFocus
+          value={this.state.taskLabel}
+          onChange={this.inputHandler}
+          onKeyDown={this.keyPressHandler}
+        />
       </header>
     );
   }
 }
-
-export default NewTaskForm;
