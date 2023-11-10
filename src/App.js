@@ -1,8 +1,8 @@
 import { Component } from 'react'
 
-import NewTaskForm from '../new-task-form/new-task-form'
-import TaskList from '../task-list/task-list'
-import Filter from '../task-filter/task-filter'
+import NewTaskForm from './components/new-task-form/new-task-form'
+import TaskList from './components/task-list/task-list'
+import Filter from './components/task-filter/task-filter'
 import './App.css'
 
 export default class App extends Component {
