@@ -22,8 +22,7 @@ export default class App extends Component {
 
   deleteItem = (id) => {
     this.setState(({ todoData }) => {
-      const idx = todoData.findIndex((el) => el.id === id)
-      const newArray = todoData.toSpliced(idx, 1)
+      const newArray = todoData.filter((el) => el.id !== id)
       return {
         todoData: newArray,
       }
@@ -44,16 +43,17 @@ export default class App extends Component {
     })
   }
 
-  onToggleDone = (id) => {
+  onToggleDone = (id, newText) => {
     this.setState(({ todoData }) => {
       const idx = todoData.findIndex((el) => el.id === id)
       const oldItem = todoData[idx]
       const newItem = {
         ...oldItem,
         done: !oldItem.done,
+        label: newText || oldItem.label,
       }
 
-      const newArray = todoData.toSpliced(idx, 1, newItem)
+      const newArray = [...todoData.slice(0, idx), newItem, ...todoData.slice(idx + 1)]
 
       return {
         todoData: newArray,
