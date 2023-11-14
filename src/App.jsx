@@ -22,7 +22,8 @@ export default class App extends Component {
 
   deleteItem = (id) => {
     this.setState(({ todoData }) => {
-      const newArray = todoData.filter((el) => el.id !== id)
+      const idx = todoData.findIndex((el) => el.id === id)
+      const newArray = todoData.toSpliced(idx, 1)
       return {
         todoData: newArray,
       }
@@ -43,17 +44,16 @@ export default class App extends Component {
     })
   }
 
-  onToggleDone = (id, newText) => {
+  onToggleDone = (id) => {
     this.setState(({ todoData }) => {
       const idx = todoData.findIndex((el) => el.id === id)
       const oldItem = todoData[idx]
       const newItem = {
         ...oldItem,
         done: !oldItem.done,
-        label: newText || oldItem.label,
       }
 
-      const newArray = [...todoData.slice(0, idx), newItem, ...todoData.slice(idx + 1)]
+      const newArray = todoData.toSpliced(idx, 1, newItem)
 
       return {
         todoData: newArray,
@@ -94,6 +94,24 @@ export default class App extends Component {
     })
   }
 
+  handleEdit = (id, newLabel) => {
+    this.setState(({ todoData }) => {
+      const idx = todoData.findIndex((el) => el.id === id)
+      const oldItem = todoData[idx]
+      const newItem = {
+        ...oldItem,
+        label: newLabel,
+      }
+
+      const newArray = todoData.slice()
+      newArray.splice(idx, 1, newItem)
+
+      return {
+        todoData: newArray,
+      }
+    })
+  }
+
   render() {
     const { todoData } = this.state
     const doneCount = todoData.filter((el) => !el.done).length
@@ -107,6 +125,7 @@ export default class App extends Component {
             onDeleted={this.deleteItem}
             addItem={this.addItem}
             onToggleDone={this.onToggleDone}
+            onEdit={this.handleEdit}
           />
           <Filter done={doneCount} todoFilterState={this.todoFilterState} clearCompleted={this.clearCompleted} />
         </section>

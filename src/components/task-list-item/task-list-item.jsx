@@ -5,7 +5,8 @@ import { formatDistanceToNow } from 'date-fns'
 
 export default class TaskListItem extends Component {
   state = {
-    done: false,
+    editing: false,
+    editedLabel: false,
   }
 
   static propTypes = {
@@ -29,33 +30,72 @@ export default class TaskListItem extends Component {
     }
   }
 
-  render() {
-    const { label, onDeleted, onToggleImportant, onToggleDone, done } = this.props
+  handleEditClick = () => {
+    this.setState({
+      editing: true,
+    })
+  }
 
+  handleEditChange = (e) => {
+    this.setState({
+      editedLabel: e.target.value,
+    })
+  }
+
+  handleEditSubmit = () => {
+    const { onEdit } = this.props
+    const { editedLabel } = this.state
+
+    onEdit(editedLabel)
+
+    this.setState({
+      editing: false,
+    })
+  }
+
+  render() {
+    const { label, onDeleted, onToggleDone, done } = this.props
+    const { editing, editedLabel } = this.state
     let className = ''
     if (done) {
       className += 'completed'
     }
+    if (editing) {
+      className += ' editing'
+    }
 
     return (
       <li className={className}>
-        <div className="view">
-          <input className="toggle" type="checkbox" onChange={this.handleChange} defaultChecked={done} />
-          <label>
-            <span
-              className="description"
-              onClick={onToggleDone}
-              onKeyDown={this.onKeyHandler}
-              role="textbox"
-              tabIndex={0}
-            >
-              {label}
-            </span>
-            <span className="created">created {formatDistanceToNow(new Date(), { includeSeconds: true })}</span>
-          </label>
-          <button type="button" className="icon icon-edit" onClick={onToggleImportant} aria-label="edit" />
-          <button type="button" className="icon icon-destroy" onClick={onDeleted} aria-label="delete" />
-        </div>
+        {editing ? (
+          <div className="edit">
+            <input
+              type="text"
+              className="edit"
+              value={editedLabel}
+              onChange={this.handleEditChange}
+              onBlur={this.handleEditSubmit}
+              onKeyDown={(e) => e.key === 'Enter' && this.handleEditSubmit()}
+            />
+          </div>
+        ) : (
+          <div className="view">
+            <input className="toggle" type="checkbox" onChange={this.handleChange} defaultChecked={done} />
+            <label>
+              <span
+                className="description"
+                onClick={onToggleDone}
+                onKeyDown={this.onKeyHandler}
+                role="textbox"
+                tabIndex={0}
+              >
+                {label}
+              </span>
+              <span className="created">created {formatDistanceToNow(new Date(), { includeSeconds: true })}</span>
+            </label>
+            <button type="button" className="icon icon-edit" onClick={this.handleEditClick} aria-label="edit" />
+            <button type="button" className="icon icon-destroy" onClick={onDeleted} aria-label="delete" />
+          </div>
+        )}
       </li>
     )
   }
