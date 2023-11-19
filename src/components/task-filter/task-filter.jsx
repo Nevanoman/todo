@@ -2,8 +2,11 @@ import './task-filter.css'
 import { Component } from 'react'
 
 class Filter extends Component {
-  state = {
-    activeButton: 'all',
+  constructor(props) {
+    super(props)
+    this.state = {
+      activeButton: 'all',
+    }
   }
 
   handleButtonClick = (filterType) => {

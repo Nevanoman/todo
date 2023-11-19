@@ -4,14 +4,18 @@ import PropTypes from 'prop-types'
 import { formatDistanceToNow } from 'date-fns'
 
 export default class TaskListItem extends Component {
-  state = {
-    editing: false,
-    editedLabel: false,
-  }
-
   static propTypes = {
     label: PropTypes.string,
     done: PropTypes.bool,
+  }
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      editing: false,
+      editedLabel: props.label,
+      initialLabel: props.label,
+    }
   }
 
   handleChange = () => {
@@ -50,6 +54,16 @@ export default class TaskListItem extends Component {
 
     this.setState({
       editing: false,
+      initialLabel: editedLabel,
+    })
+  }
+
+  handleEditCancel = () => {
+    const { initialLabel } = this.state
+
+    this.setState({
+      editing: false,
+      editedLabel: initialLabel,
     })
   }
 
@@ -67,14 +81,17 @@ export default class TaskListItem extends Component {
     return (
       <li className={className}>
         {editing ? (
-          <div className="edit">
+          <div>
             <input
               type="text"
               className="edit"
               value={editedLabel}
               onChange={this.handleEditChange}
-              onBlur={this.handleEditSubmit}
-              onKeyDown={(e) => e.key === 'Enter' && this.handleEditSubmit()}
+              onBlur={this.handleEditCancel}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') this.handleEditSubmit()
+                if (e.key === 'Escape') this.handleEditCancel()
+              }}
             />
           </div>
         ) : (

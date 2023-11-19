@@ -22,8 +22,7 @@ export default class App extends Component {
 
   deleteItem = (id) => {
     this.setState(({ todoData }) => {
-      const idx = todoData.findIndex((el) => el.id === id)
-      const newArray = todoData.toSpliced(idx, 1)
+      const newArray = todoData.filter((el) => el.id !== id)
       return {
         todoData: newArray,
       }
