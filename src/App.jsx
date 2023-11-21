@@ -52,7 +52,8 @@ export default class App extends Component {
         done: !oldItem.done,
       }
 
-      const newArray = todoData.toSpliced(idx, 1, newItem)
+      const newArray = [...todoData]
+      newArray.splice(idx, 1, newItem)
 
       return {
         todoData: newArray,
@@ -126,7 +127,12 @@ export default class App extends Component {
             onToggleDone={this.onToggleDone}
             onEdit={this.handleEdit}
           />
-          <Filter done={doneCount} todoFilterState={this.todoFilterState} clearCompleted={this.clearCompleted} />
+          <Filter
+            activeButton={this.state.todoFilter}
+            done={doneCount}
+            todoFilterState={this.todoFilterState}
+            clearCompleted={this.clearCompleted}
+          />
         </section>
       </div>
     )

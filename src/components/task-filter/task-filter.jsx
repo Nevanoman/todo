@@ -2,25 +2,13 @@ import './task-filter.css'
 import { Component } from 'react'
 
 class Filter extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      activeButton: 'all',
-    }
-  }
-
   handleButtonClick = (filterType) => {
     const { todoFilterState } = this.props
     todoFilterState(filterType)
-
-    this.setState({
-      activeButton: filterType,
-    })
   }
 
   render() {
-    const { done, clearCompleted } = this.props
-    const { activeButton } = this.state
+    const { done, clearCompleted, activeButton } = this.props
 
     const filterButtons = [
       { label: 'All', type: 'all' },
