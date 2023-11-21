@@ -127,12 +127,7 @@ export default class App extends Component {
             onToggleDone={this.onToggleDone}
             onEdit={this.handleEdit}
           />
-          <Filter
-            activeButton={this.state.todoFilter}
-            done={doneCount}
-            todoFilterState={this.todoFilterState}
-            clearCompleted={this.clearCompleted}
-          />
+          <Filter done={doneCount} todoFilterState={this.todoFilterState} clearCompleted={this.clearCompleted} />
         </section>
       </div>
     )
