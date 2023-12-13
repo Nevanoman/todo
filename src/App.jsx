@@ -31,6 +31,7 @@ export default class App extends Component {
   }
 
   addItem = (text) => {
+    if (!text.trim()) return
     const newItem = {
       label: text,
       id: Math.random().toString(36).slice(2),
