@@ -4,11 +4,14 @@ import './new-task-form.css'
 export default class NewTaskForm extends Component {
   state = {
     label: '',
+    min: '',
+    sec: '',
   }
 
   static defaultProps = {
     onChange: () => {},
     onSubmit: () => {},
+    addItem: () => {},
   }
 
   onChange = (e) => {
@@ -17,18 +20,33 @@ export default class NewTaskForm extends Component {
     })
   }
 
+  onChangeMin = (e) => {
+    this.setState({
+      min: e.target.value,
+    })
+  }
+
+  onChangeSec = (e) => {
+    this.setState({
+      sec: e.target.value,
+    })
+  }
+
   onSubmit = (e) => {
-    const { addItem } = this.props
-    const { label } = this.state
+    const { addItem, addTimer } = this.props
+    const { label, min, sec } = this.state
     e.preventDefault()
     addItem(label)
+    addTimer(min, sec)
     this.setState({
       label: '',
+      min: '',
+      sec: '',
     })
   }
 
   render() {
-    const { label } = this.state
+    const { label, min, sec } = this.state
     return (
       <form className="header" onSubmit={this.onSubmit}>
         <h1>My Todo List</h1>
@@ -39,6 +57,11 @@ export default class NewTaskForm extends Component {
           onChange={this.onChange}
           value={label}
         />
+        <input className="new-todo-form__timer" placeholder="Min" onChange={this.onChangeMin} value={min} />
+        <input className="new-todo-form__timer" placeholder="Sec" onChange={this.onChangeSec} value={sec} />
+        <button type="submit" className="battonSabmit">
+          Submit
+        </button>
       </form>
     )
   }

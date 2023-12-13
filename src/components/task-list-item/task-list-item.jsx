@@ -3,6 +3,8 @@ import { Component } from 'react'
 import PropTypes from 'prop-types'
 import { formatDistanceToNow } from 'date-fns'
 
+import Timer from '../task-timer/task-timer'
+
 export default class TaskListItem extends Component {
   static propTypes = {
     label: PropTypes.string,
@@ -68,7 +70,7 @@ export default class TaskListItem extends Component {
   }
 
   render() {
-    const { label, onDeleted, onToggleDone, done } = this.props
+    const { label, onDeleted, onToggleDone, done, timer } = this.props
     const { editing, editedLabel } = this.state
     let className = ''
     if (done) {
@@ -107,6 +109,7 @@ export default class TaskListItem extends Component {
               >
                 {label}
               </span>
+              <Timer timer={timer} />
               <span className="created">created {formatDistanceToNow(new Date(), { includeSeconds: true })}</span>
             </label>
             <button type="button" className="icon icon-edit" onClick={this.handleEditClick} aria-label="edit" />
