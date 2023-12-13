@@ -48,21 +48,23 @@ export default class NewTaskForm extends Component {
   render() {
     const { label, min, sec } = this.state
     return (
-      <form className="header" onSubmit={this.onSubmit}>
+      <header className="header">
         <h1>My Todo List</h1>
-        <input
-          name="name"
-          className="new-todo"
-          placeholder="What needs to be done?"
-          onChange={this.onChange}
-          value={label}
-        />
-        <input className="new-todo-form__timer" placeholder="Min" onChange={this.onChangeMin} value={min} />
-        <input className="new-todo-form__timer" placeholder="Sec" onChange={this.onChangeSec} value={sec} />
-        <button type="submit" className="battonSabmit">
-          Submit
-        </button>
-      </form>
+        <form className="new-todo-form header" onSubmit={this.onSubmit}>
+          <input
+            name="name"
+            className="new-todo"
+            placeholder="What needs to be done?"
+            onChange={this.onChange}
+            value={label}
+          />
+          <input className="new-todo-form__timer" placeholder="Min" onChange={this.onChangeMin} value={min} />
+          <input className="new-todo-form__timer" placeholder="Sec" onChange={this.onChangeSec} value={sec} />
+          <button type="submit" className="battonSabmit">
+            Submit
+          </button>
+        </form>
+      </header>
     )
   }
 }
