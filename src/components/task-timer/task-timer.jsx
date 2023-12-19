@@ -2,7 +2,8 @@ import { Component } from 'react'
 
 export default class Timer extends Component {
   state = {
-    timer: '',
+    timer: 0,
+    isTimerStarted: false,
   }
 
   componentDidMount() {
@@ -22,10 +23,13 @@ export default class Timer extends Component {
   }
 
   startTimer = () => {
-    const { isTimerStarted } = this.state
-    if (!isTimerStarted) {
+    const { isTimerStarted, timer } = this.state
+    if (!isTimerStarted && timer >= 0) {
       this.timerID = setInterval(() => {
-        this.setState((prevState) => ({ timer: prevState.timer - 1 }))
+        this.setState((prevState) => ({ timer: Math.max(prevState.timer - 1, 0) }))
+        if (this.timer === 0) {
+          this.stopTimer()
+        }
       }, 1000)
 
       this.setState({
