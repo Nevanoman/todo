@@ -1,15 +1,17 @@
 import { Component } from 'react'
+import intervalToDuration from 'date-fns/intervalToDuration'
 
 import NewTaskForm from './components/new-task-form/new-task-form'
 import TaskList from './components/task-list/task-list'
 import Filter from './components/task-filter/task-filter'
+
 import './App.css'
 
 export default class App extends Component {
   state = {
     todoData: [],
     todoFilter: 'all',
-    timer: '',
+    timer: 0,
   }
 
   static defaultProps = {
@@ -19,6 +21,7 @@ export default class App extends Component {
     todoFilterState: () => {},
     filter: () => {},
     clearCompleted: () => {},
+    formatTime: () => {},
   }
 
   deleteItem = (id) => {
@@ -30,11 +33,13 @@ export default class App extends Component {
     })
   }
 
-  addItem = (text) => {
+  addItem = (text, timer) => {
     if (!text.trim()) return
     const newItem = {
       label: text,
       id: Math.random().toString(36).slice(2),
+      timer,
+      isTimerStarted: true,
     }
 
     this.setState(({ todoData }) => {
@@ -121,6 +126,13 @@ export default class App extends Component {
     })
   }
 
+  formatTime = (time) => {
+    console.log(time)
+    const duration = intervalToDuration({ start: 0, end: time })
+    const formatedTime = `${duration.minutes}:${duration.seconds}`
+    return formatedTime
+  }
+
   render() {
     const { todoData, timer } = this.state
     const doneCount = todoData.filter((el) => !el.done).length
@@ -136,6 +148,7 @@ export default class App extends Component {
             onToggleDone={this.onToggleDone}
             onEdit={this.handleEdit}
             timer={timer}
+            formatTime={this.formatTime}
           />
           <Filter done={doneCount} todoFilterState={this.todoFilterState} clearCompleted={this.clearCompleted} />
         </section>

@@ -21,24 +21,30 @@ export default class NewTaskForm extends Component {
   }
 
   onChangeMin = (e) => {
-    const min = e.target.value.replace(/\D/g, '')
+    const min = e.target.value
     this.setState({
       min,
     })
   }
 
   onChangeSec = (e) => {
-    const sec = e.target.value.replace(/\D/g, '')
+    const sec = e.target.value
     this.setState({
       sec,
     })
+  }
+
+  formatToMs = (min, sec) => {
+    const sms = sec * 1000
+    const mms = min * 60000
+    return sms + mms
   }
 
   onSubmit = (e) => {
     const { addItem, addTimer } = this.props
     const { label, min, sec } = this.state
     e.preventDefault()
-    addItem(label)
+    addItem(label, this.formatToMs(min, sec))
     addTimer(min, sec)
     this.setState({
       label: '',
@@ -65,14 +71,14 @@ export default class NewTaskForm extends Component {
             placeholder="Min"
             onChange={this.onChangeMin}
             value={min}
-            type="tel"
+            type="number"
           />
           <input
             className="new-todo-form__timer"
             placeholder="Sec"
             onChange={this.onChangeSec}
             value={sec}
-            type="tel"
+            type="number"
           />
           <button type="submit" className="battonSabmit">
             Submit
