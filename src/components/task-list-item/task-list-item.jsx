@@ -1,154 +1,126 @@
 import './task-list-item.css'
-import { Component } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { formatDistanceToNow } from 'date-fns'
 
-export default class TaskListItem extends Component {
-  static propTypes = {
-    label: PropTypes.string,
-    done: PropTypes.bool,
-  }
+function TaskListItem({ label, done, onToggleDone, onEdit, timer, formatTime }) {
+  const [doneState, setDone] = useState(done)
+  const [editing, setEditing] = useState(false)
+  const [editedLabel, setEditingLabel] = useState(label)
+  const [initialLabel, setInitialLabel] = useState(label)
+  const [isTimerStarted, setIsTimerStarted] = useState(false)
+  const [timerValue, setTimerValue] = useState(timer)
+  const [completedClassName, setCompletedClassName] = useState('')
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      editing: false,
-      editedLabel: props.label,
-      initialLabel: props.label,
-      isTimerStarted: props.isTimerStarted,
-      timer: props.timer,
+  useEffect(() => {
+    if (doneState) {
+      setCompletedClassName('completed')
     }
-  }
+    if (editing) {
+      setCompletedClassName('editing')
+    } else {
+      setCompletedClassName('')
+    }
+  }, [doneState, editing])
 
-  handleChange = () => {
-    const { onToggleDone } = this.props
-    const { done } = this.state
+  const handleChange = () => {
     onToggleDone()
-    this.setState({
-      done: !done,
-    })
+    setDone(!doneState)
   }
 
-  onKeyHandler = (event) => {
-    const { onToggleDone } = this.props
+  const onKeyHandler = (event) => {
     if (event.key === 'Enter') {
       onToggleDone()
     }
   }
 
-  handleEditClick = () => {
-    this.setState({
-      editing: true,
-    })
+  const handleEditChange = (e) => {
+    setEditingLabel(e.target.value)
   }
 
-  handleEditChange = (e) => {
-    this.setState({
-      editedLabel: e.target.value,
-    })
-  }
-
-  handleEditSubmit = () => {
-    const { onEdit } = this.props
-    const { editedLabel } = this.state
-
+  const handleEditSubmit = () => {
     onEdit(editedLabel)
-
-    this.setState({
-      editing: false,
-      initialLabel: editedLabel,
-    })
+    setEditing(false)
+    setInitialLabel(editedLabel)
   }
 
-  handleEditCancel = () => {
-    const { initialLabel } = this.state
-
-    this.setState({
-      editing: false,
-      editedLabel: initialLabel,
-    })
+  const handleEditCancel = () => {
+    setEditing(false)
+    setEditingLabel(initialLabel)
   }
 
-  startTimer = () => {
-    const { isTimerStarted, timer } = this.state
-
+  const startTimer = useCallback(() => {
     if (isTimerStarted) {
-      this.timerID = setInterval(() => {
-        console.log(timer)
-        this.setState(
-          (prevState) => ({
-            timer: prevState.timer - 1000,
-          }),
-          () => {
-            console.log(timer)
-          }
-        )
+      const timerID = setInterval(() => {
+        setTimerValue((prevTimer) => prevTimer - 1000)
       }, 1000)
+      return () => clearInterval(timerID)
     }
+    return null
+  }, [isTimerStarted])
+
+  const stopTimer = () => {
+    setIsTimerStarted(false)
+    return null
   }
 
-  stopTimer = () => {
-    clearInterval(this.timerID)
-
-    this.setState({
-      isTimerStarted: false,
-    })
-  }
-
-  render() {
-    const { label, onDeleted, onToggleDone, done, timer, formatTime, isTimerStarted } = this.props
-    console.log(isTimerStarted)
-
-    const { editing, editedLabel } = this.state
-    let className = ''
-    if (done) {
-      className += 'completed'
+  useEffect(() => {
+    if (isTimerStarted) {
+      const timerID = startTimer()
+      return () => clearInterval(timerID)
     }
-    if (editing) {
-      className += ' editing'
-    }
+  }, [isTimerStarted, startTimer])
 
-    return (
-      <li className={className}>
-        {editing ? (
-          <div>
-            <input
-              type="text"
-              className="edit"
-              value={editedLabel}
-              onChange={this.handleEditChange}
-              onBlur={this.handleEditCancel}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') this.handleEditSubmit()
-                if (e.key === 'Escape') this.handleEditCancel()
-              }}
-            />
-          </div>
-        ) : (
-          <div className="view">
-            <input className="toggle" type="checkbox" onChange={this.handleChange} defaultChecked={done} />
-            <label>
-              <span
-                className="description"
-                onClick={onToggleDone}
-                onKeyDown={this.onKeyHandler}
-                role="textbox"
-                tabIndex={0}
-              >
-                {label}
-              </span>
-              <span className="description">
-                <button type="button" className="icon icon-play" aria-label="edit" onClick={this.startTimer} />
-                <button type="button" className="icon icon-pause" aria-label="edit" onClick={this.stopTimer} />
-                {formatTime(timer)}
-              </span>
-              <span className="created">created {formatDistanceToNow(new Date(), { includeSeconds: true })}</span>
-            </label>
-            <button type="button" className="icon icon-edit" onClick={this.handleEditClick} aria-label="edit" />
-            <button type="button" className="icon icon-destroy" onClick={onDeleted} aria-label="delete" />
-          </div>
-        )}
-      </li>
-    )
-  }
+  return (
+    <li className={completedClassName}>
+      {editing ? (
+        <div>
+          <input
+            type="text"
+            className="edit"
+            value={editedLabel}
+            onChange={handleEditChange}
+            onBlur={handleEditCancel}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleEditSubmit()
+              if (e.key === 'Escape') handleEditCancel()
+            }}
+          />
+        </div>
+      ) : (
+        <div className="view">
+          <input className="toggle" type="checkbox" onChange={handleChange} defaultChecked={done} />
+          <label>
+            <span className="description" onClick={onToggleDone} onKeyDown={onKeyHandler} role="textbox" tabIndex={0}>
+              {label}
+            </span>
+            <span className="description">
+              <button type="button" className="icon icon-play" aria-label="edit" onClick={startTimer} />
+              <button type="button" className="icon icon-pause" aria-label="edit" onClick={stopTimer} />
+              {formatTime(timer)}
+            </span>
+            <span className="created">created {formatDistanceToNow(new Date(), { includeSeconds: true })}</span>
+          </label>
+          <button type="button" className="icon icon-edit" aria-label="edit" onClick={() => setIsTimerStarted(true)} />
+          <button
+            type="button"
+            className="icon icon-destroy"
+            aria-label="delete"
+            onClick={() => setIsTimerStarted(false)}
+          />
+        </div>
+      )}
+    </li>
+  )
 }
+
+TaskListItem.propTypes = {
+  label: PropTypes.string,
+  done: PropTypes.bool,
+  onToggleDone: PropTypes.func,
+  onEdit: PropTypes.func,
+  timer: PropTypes.number,
+  formatTime: PropTypes.func,
+}
+
+export default TaskListItem
