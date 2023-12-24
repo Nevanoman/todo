@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import intervalToDuration from 'date-fns/intervalToDuration'
 
 import NewTaskForm from '../new-task-form/new-task-form'
@@ -9,6 +9,8 @@ import './app.css'
 function App() {
   const [todoData, setTodoData] = useState([])
   const [todoFilter, setTodoFilter] = useState('all')
+
+  useEffect(() => {}, [todoData])
 
   const deleteItem = (id) => {
     setTodoData((prevData) => prevData.filter((el) => el.id !== id))
@@ -27,13 +29,13 @@ function App() {
     setTodoData((prevData) => [...prevData, newItem])
   }
 
-  const incrementTimer = (id) => {
+  const decrementTimer = (id) => {
     setTodoData((prevData) => {
       const idx = prevData.findIndex((el) => el.id === id)
       const oldItem = prevData[idx]
       const newItem = {
         ...oldItem,
-        timer: oldItem.timer + 1000,
+        timer: oldItem.timer - 1000,
       }
 
       const newArray = [...prevData]
@@ -63,19 +65,6 @@ function App() {
     if (text !== todoFilter) {
       setTodoFilter(text)
     }
-  }
-
-  const filter = () => {
-    if (todoFilter === 'completed') {
-      return todoData.filter((el) => el.done)
-    }
-    if (todoFilter === 'active') {
-      return todoData.filter((el) => !el.done)
-    }
-    if (todoFilter === 'all') {
-      return todoData
-    }
-    return []
   }
 
   const clearCompleted = () => {
@@ -111,13 +100,14 @@ function App() {
       <NewTaskForm addItem={addItem} />
       <section className="main">
         <TaskList
-          tasks={filter()}
+          tasks={todoData}
           onDeleted={deleteItem}
           addItem={addItem}
           onToggleDone={onToggleDone}
           onEdit={handleEdit}
           formatTime={formatTime}
-          incrementTimer={incrementTimer}
+          decrementTimer={decrementTimer}
+          currentFilter={todoFilter}
         />
         <Filter done={doneCount} todoFilterState={todoFilterState} clearCompleted={clearCompleted} />
       </section>
