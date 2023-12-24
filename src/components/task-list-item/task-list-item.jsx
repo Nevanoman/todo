@@ -1,31 +1,32 @@
 import './task-list-item.css'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { formatDistanceToNow } from 'date-fns'
 
-function TaskListItem({ label, done, onToggleDone, onEdit, timer, formatTime }) {
-  const [doneState, setDone] = useState(done)
+function TaskListItem({
+  label,
+  done,
+  onDeleted,
+  onToggleDone,
+  onEdit,
+  timer,
+  formatTime,
+  incrementTimer,
+  isTimerStarted,
+}) {
   const [editing, setEditing] = useState(false)
   const [editedLabel, setEditingLabel] = useState(label)
   const [initialLabel, setInitialLabel] = useState(label)
-  const [isTimerStarted, setIsTimerStarted] = useState(false)
-  const [timerValue, setTimerValue] = useState(timer)
-  const [completedClassName, setCompletedClassName] = useState('')
+  const [taskClassName, setTaskClassName] = useState('active')
 
   useEffect(() => {
-    if (doneState) {
-      setCompletedClassName('completed')
+    if (isTimerStarted) {
+      // incrementTimer()
     }
-    if (editing) {
-      setCompletedClassName('editing')
-    } else {
-      setCompletedClassName('')
-    }
-  }, [doneState, editing])
+  }, [isTimerStarted])
 
   const handleChange = () => {
     onToggleDone()
-    setDone(!doneState)
   }
 
   const onKeyHandler = (event) => {
@@ -49,30 +50,16 @@ function TaskListItem({ label, done, onToggleDone, onEdit, timer, formatTime }) 
     setEditingLabel(initialLabel)
   }
 
-  const startTimer = useCallback(() => {
-    if (isTimerStarted) {
-      const timerID = setInterval(() => {
-        setTimerValue((prevTimer) => prevTimer - 1000)
-      }, 1000)
-      return () => clearInterval(timerID)
-    }
-    return null
-  }, [isTimerStarted])
-
-  const stopTimer = () => {
-    setIsTimerStarted(false)
-    return null
-  }
-
   useEffect(() => {
-    if (isTimerStarted) {
-      const timerID = startTimer()
-      return () => clearInterval(timerID)
+    if (done) {
+      setTaskClassName('completed')
+    } else {
+      setTaskClassName('active')
     }
-  }, [isTimerStarted, startTimer])
+  }, [done])
 
   return (
-    <li className={completedClassName}>
+    <li className={taskClassName}>
       {editing ? (
         <div>
           <input
@@ -89,25 +76,20 @@ function TaskListItem({ label, done, onToggleDone, onEdit, timer, formatTime }) 
         </div>
       ) : (
         <div className="view">
-          <input className="toggle" type="checkbox" onChange={handleChange} defaultChecked={done} />
+          <input className="toggle" type="checkbox" onChange={handleChange} defaultChecked={done} checked={done} />
           <label>
-            <span className="description" onClick={onToggleDone} onKeyDown={onKeyHandler} role="textbox" tabIndex={0}>
+            <span className="description" onClick={handleChange} onKeyDown={onKeyHandler} role="textbox" tabIndex={0}>
               {label}
             </span>
             <span className="description">
-              <button type="button" className="icon icon-play" aria-label="edit" onClick={startTimer} />
-              <button type="button" className="icon icon-pause" aria-label="edit" onClick={stopTimer} />
+              <button type="button" className="icon icon-play" aria-label="edit" />
+              <button type="button" className="icon icon-pause" aria-label="edit" />
               {formatTime(timer)}
             </span>
             <span className="created">created {formatDistanceToNow(new Date(), { includeSeconds: true })}</span>
           </label>
-          <button type="button" className="icon icon-edit" aria-label="edit" onClick={() => setIsTimerStarted(true)} />
-          <button
-            type="button"
-            className="icon icon-destroy"
-            aria-label="delete"
-            onClick={() => setIsTimerStarted(false)}
-          />
+          <button type="button" className="icon icon-edit" aria-label="edit" onClick={() => setEditing(true)} />
+          <button type="button" className="icon icon-destroy" aria-label="delete" onClick={onDeleted} />
         </div>
       )}
     </li>
@@ -117,6 +99,7 @@ function TaskListItem({ label, done, onToggleDone, onEdit, timer, formatTime }) 
 TaskListItem.propTypes = {
   label: PropTypes.string,
   done: PropTypes.bool,
+  onDeleted: PropTypes.func,
   onToggleDone: PropTypes.func,
   onEdit: PropTypes.func,
   timer: PropTypes.number,

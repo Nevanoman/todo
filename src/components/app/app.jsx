@@ -9,27 +9,38 @@ import './app.css'
 function App() {
   const [todoData, setTodoData] = useState([])
   const [todoFilter, setTodoFilter] = useState('all')
-  const [timer, setTimer] = useState(0)
 
   const deleteItem = (id) => {
     setTodoData((prevData) => prevData.filter((el) => el.id !== id))
   }
 
-  const addItem = (text) => {
+  const addItem = (text, timer) => {
     if (!text.trim()) return
     const newItem = {
       label: text,
       id: Math.random().toString(36).slice(2),
       timer,
       isTimerStarted: true,
+      done: false,
     }
 
     setTodoData((prevData) => [...prevData, newItem])
   }
 
-  const addTimer = (min, sec) => {
-    const tim = Number(min) * 60 + Number(sec)
-    setTimer(tim)
+  const incrementTimer = (id) => {
+    setTodoData((prevData) => {
+      const idx = prevData.findIndex((el) => el.id === id)
+      const oldItem = prevData[idx]
+      const newItem = {
+        ...oldItem,
+        timer: oldItem.timer + 1000,
+      }
+
+      const newArray = [...prevData]
+      newArray.splice(idx, 1, newItem)
+
+      return newArray
+    })
   }
 
   const onToggleDone = (id) => {
@@ -97,7 +108,7 @@ function App() {
 
   return (
     <div className="todoapp">
-      <NewTaskForm addItem={addItem} addTimer={addTimer} />
+      <NewTaskForm addItem={addItem} />
       <section className="main">
         <TaskList
           tasks={filter()}
@@ -105,8 +116,8 @@ function App() {
           addItem={addItem}
           onToggleDone={onToggleDone}
           onEdit={handleEdit}
-          timer={timer}
           formatTime={formatTime}
+          incrementTimer={incrementTimer}
         />
         <Filter done={doneCount} todoFilterState={todoFilterState} clearCompleted={clearCompleted} />
       </section>

@@ -32,7 +32,7 @@ function NewTaskForm({ addItem }) {
 
   const onSubmit = (e) => {
     e.preventDefault()
-    addItem(label, formatToMs)
+    addItem(label, formatToMs())
     setLabel('')
     setMin('')
     setSec('')
