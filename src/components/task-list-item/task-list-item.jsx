@@ -23,7 +23,7 @@ function TaskListItem({
   const intervalRef = useRef(null)
 
   useEffect(() => {
-    if (timer > 0) {
+    if (timer > 0 && !done) {
       intervalRef.current = setInterval(() => {
         decrementTimer()
       }, 1000)
@@ -42,7 +42,7 @@ function TaskListItem({
   }
 
   const handleContinueTimer = () => {
-    if (done) return
+    if (done || timer <= 0) return
     intervalRef.current = setInterval(() => {
       decrementTimer()
     }, 1000)
@@ -56,7 +56,6 @@ function TaskListItem({
 
   const handleChange = () => {
     onToggleDone()
-    decrementTimer()
   }
 
   const onKeyHandler = (event) => {
